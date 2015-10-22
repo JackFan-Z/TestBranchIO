@@ -31,6 +31,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -93,6 +94,21 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("TestBranch", "SignInButton");
+                JSONObject data = new JSONObject();
+                try {
+                    data.put("v", "3");
+                    data.put("tid", "UA-69122167-1");// GA Tracking ID
+                    data.put("cid", "23456");
+                    data.put("t", "event");
+                    data.put("ec", "test category");
+                    data.put("ea", "purchase");
+                    data.put("el", "blue_shoes"); // event label
+                    data.put("ea", "300"); // event value
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Branch.getInstance().userCompletedAction("purchase", data);
                 attemptLogin();
             }
         });
