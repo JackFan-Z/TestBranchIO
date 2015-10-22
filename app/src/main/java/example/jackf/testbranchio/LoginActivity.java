@@ -97,21 +97,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("TestBranch", "SignInButton");
-                JSONObject data = new JSONObject();
-                try {
-                    data.put("v", "3");
-                    data.put("tid", "UA-69122167-1");// GA Tracking ID
-                    data.put("cid", "23456");
-                    data.put("t", "event");
-                    data.put("ec", "test category");
-                    data.put("ea", "purchase");
-                    data.put("el", "blue_shoes"); // event label
-                    data.put("ea", "300"); // event value
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                Branch.getInstance().userCompletedAction("purchase", data);
                 attemptLogin();
             }
         });
@@ -133,6 +118,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     // ... insert custom logic here ...
                     // params are the deep linked params associated with the link that the user clicked before showing up
                     Log.i("BranchConfigTest", "deep link data: " + referringParams.toString());
+                    foundBranchUser(referringParams);
                 } else {
                     Log.i("Branch", error.getMessage());
                 }
@@ -249,6 +235,36 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
         return password.length() > 4;
+    }
+
+    private void foundBranchUser(JSONObject referringParams) {
+        Log.d("TestBranch", "foundBranchUser");
+
+        try {
+            String cid = referringParams.getString("$identity_id");
+            Log.d("TestBranch", "cid " + cid);
+            String shareFrom = referringParams.getString("share from");
+            String shareWith = referringParams.getString("share with");
+            Log.d("TestBranch", "Share from " + shareFrom);
+            Log.d("TestBranch", "Share with " + shareWith);
+            JSONObject data = new JSONObject();
+            try {
+                data.put("v", "3");
+                data.put("tid", "UA-69122167-1");// GA Tracking ID
+                data.put("cid", cid);
+                data.put("t", "event");
+                data.put("ec", "test category");
+                data.put("ea", "foundBranchUser");
+                data.put("el", "login"); // event label
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            Branch.getInstance().userCompletedAction("purchase", data);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**

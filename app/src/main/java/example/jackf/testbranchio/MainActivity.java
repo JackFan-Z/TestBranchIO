@@ -9,14 +9,20 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import io.branch.referral.Branch;
+import io.branch.referral.BranchError;
+import io.branch.referral.BranchShortLinkBuilder;
+
 public class MainActivity extends AppCompatActivity {
 
     private TextView textView;
+    private String userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
         textView = (TextView) findViewById(R.id.userTextView);
         setTitle("Welcome");
-        String userName = getIntent().getStringExtra(LoginActivity.EXTRA_USER_NAME);
+        userName = getIntent().getStringExtra(LoginActivity.EXTRA_USER_NAME);
         if (userName != null) {
             textView.setText(userName);
         } else {
@@ -73,8 +79,9 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    public static void onClickEmail(Context context, String email) {
-        String body = "Share with you\nhttp://www.zappoint.com";
+    private void onClickEmail(Context context, String email) {
+        String downloadLink = GenerateBranchUrl(context, email);
+        String body = "Recommend the app.\n\nPlease click the line to download\n" + downloadLink;
 
         String uriText = "mailto:" + email +
                 "?subject=" + Uri.encode("Share with you") +
@@ -86,5 +93,33 @@ public class MainActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setData(uri);
         context.startActivity(intent);
+    }
+
+    private String GenerateBranchUrl(Context context, String email) {
+        BranchShortLinkBuilder shortUrlBuilder = new BranchShortLinkBuilder(context)
+                .addTag("testbranchio")
+                .setChannel("email")
+                .setFeature("feature1")
+                .setStage("1")
+                .addParameters("share with", email)
+                .addParameters("share from", userName);
+
+        // Get URL Asynchronously
+        /*
+        shortUrlBuilder.generateShortUrl(new Branch.BranchLinkCreateListener() {
+            @Override
+            public void onLinkCreate(String url, BranchError error) {
+                if (error != null) {
+                    Log.e("Branch Error", "Branch create short url failed. Caused by -" + error.getMessage());
+                } else {
+                    Log.i("Branch", "Got a Branch URL " + url);
+                }
+            }
+        });
+        */
+        // OR Get the URL synchronously
+        String shortUrl = shortUrlBuilder.getShortUrl();
+        Log.i("Branch", "Got a Branch URL " + shortUrl);
+        return shortUrl;
     }
 }
