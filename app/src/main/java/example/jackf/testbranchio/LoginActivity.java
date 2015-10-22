@@ -47,6 +47,7 @@ import static android.Manifest.permission.READ_CONTACTS;
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
+    public static String EXTRA_USER_NAME = "extra_user_name";
     /**
      * Id to identity READ_CONTACTS permission request.
      */
@@ -57,6 +58,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * TODO: remove after connecting to a real authentication system.
      */
     private static final String[] DUMMY_CREDENTIALS = new String[]{
+            "zap@invisibi.com.tw:12345",
             "foo@example.com:hello", "bar@example.com:world"
     };
     /**
@@ -77,6 +79,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
+        mEmailView.setText("zap@invisibi.com.tw");
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -342,7 +345,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserLoginTask extends AsyncTask<Void, Void, String> {
 
         private final String mEmail;
         private final String mPassword;
@@ -353,37 +356,45 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected String doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
 
+            String errorMsg = null;
             try {
                 // Simulate network access.
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
-                return false;
+                errorMsg = getString(R.string.error_incorrect_password);
+                return errorMsg;
             }
 
             for (String credential : DUMMY_CREDENTIALS) {
                 String[] pieces = credential.split(":");
                 if (pieces[0].equals(mEmail)) {
                     // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
+                    if ( pieces[1].equals(mPassword) == false ) {
+                        errorMsg = getString(R.string.error_incorrect_password);
+                    }
+                    return errorMsg;
                 }
             }
 
             // TODO: register the new account here.
-            return true;
+            errorMsg = "The account does not exist";
+            return errorMsg;
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
+        protected void onPostExecute(final String errorMsg) {
             mAuthTask = null;
             showProgress(false);
 
-            if (success) {
-                finish();
+            if (errorMsg == null) {
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                intent.putExtra(EXTRA_USER_NAME, mEmail);
+                startActivity(intent);
             } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
+                mPasswordView.setError(errorMsg);
                 mPasswordView.requestFocus();
             }
         }
