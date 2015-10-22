@@ -22,10 +22,10 @@
             android:value="true" />
         <meta-data
             android:name="io.branch.sdk.BranchKey"
-            android:value="key_live_hhdIOvbEjIsBF7AiAkPDygpeCqhLzWfi" />
+            android:value="key_live_cfnNNwg1LQmutN84lRa1TfahAtpy6oni" />
         <meta-data
             android:name="io.branch.sdk.BranchKey.test"
-            android:value="key_test_jmjTTreDiODzA7BkviUqxecbBxfKFL26" />
+            android:value="key_test_bpdILAk4HQlBqI13oNb8LkblrujuZfaq" />
 
         <activity
             android:name=".LoginActivity"
@@ -36,7 +36,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <data android:scheme="zappointtest" />
+                <data android:scheme="testbranchio" />
 
                 <action android:name="android.intent.action.VIEW" />
 
