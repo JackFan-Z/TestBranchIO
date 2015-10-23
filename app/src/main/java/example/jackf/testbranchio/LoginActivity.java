@@ -269,7 +269,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            Branch.getInstance().userCompletedAction("purchase", data);
+            Branch.getInstance().userCompletedAction("open", data);
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             intent.putExtra(EXTRA_USER_NAME, shareWith);
             intent.putExtra(EXTRA_SHARE_FROM, shareFrom);
