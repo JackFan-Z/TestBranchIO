@@ -48,6 +48,7 @@ import static android.Manifest.permission.READ_CONTACTS;
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     public static String EXTRA_USER_NAME = "extra_user_name";
+    public static String EXTRA_SHARE_FROM = "extra_share_from";
     /**
      * Id to identity READ_CONTACTS permission request.
      */
@@ -57,10 +58,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * A dummy authentication store containing known user names and passwords.
      * TODO: remove after connecting to a real authentication system.
      */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "zap@invisibi.com.tw:12345",
-            "foo@example.com:hello", "bar@example.com:world"
-    };
+    private static ArrayList<String> DUMMY_CREDENTIALS = new ArrayList<>();
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -79,7 +77,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
-        mEmailView.setText("zap@invisibi.com.tw");
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -103,6 +100,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        DUMMY_CREDENTIALS.add("zap@invisibi.com.tw:12345");
+        DUMMY_CREDENTIALS.add("foo@example.com:hello");
+        addCurrAccount();
     }
 
     @Override
@@ -237,6 +238,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         return password.length() > 4;
     }
 
+    private void addCurrAccount() {
+        MyPreference preference = new MyPreference(this);
+        String account = preference.getString(MyPreference.EXTRA_CURR_ACCOUNT);
+        if (account != null) {
+            DUMMY_CREDENTIALS.add(account + ":*");
+            mEmailView.setText(account);
+        }
+    }
+
     private void foundBranchUser(JSONObject referringParams) {
         Log.d("TestBranch", "foundBranchUser");
 
@@ -260,7 +270,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 e.printStackTrace();
             }
             Branch.getInstance().userCompletedAction("purchase", data);
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            intent.putExtra(EXTRA_USER_NAME, shareWith);
+            intent.putExtra(EXTRA_SHARE_FROM, shareFrom);
+            startActivity(intent);
 
+            MyPreference preference = new MyPreference(this);
+            preference.putString(MyPreference.EXTRA_CURR_ACCOUNT, shareWith);
+            addCurrAccount();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -388,7 +405,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 String[] pieces = credential.split(":");
                 if (pieces[0].equals(mEmail)) {
                     // Account exists, return true if the password matches.
-                    if ( pieces[1].equals(mPassword) == false ) {
+                    if ( pieces[1].compareTo("*") != 0 && pieces[1].equals(mPassword) == false ) {
                         errorMsg = getString(R.string.error_incorrect_password);
                     }
                     return errorMsg;

@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView textView;
     private String userName;
+    private String shareFrom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +48,11 @@ public class MainActivity extends AppCompatActivity {
         } else {
             textView.setText("Unknown user");
         }
+        shareFrom = getIntent().getStringExtra(LoginActivity.EXTRA_SHARE_FROM);
+        if (shareFrom != null) {
+            TextView shareFromTextView = (TextView) findViewById(R.id.shareFrom);
+            shareFromTextView.setText("recommended by\n" + shareFrom);
+        }
     }
 
     private void AskForEmail() {
@@ -58,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT);
-        input.setText("@zappoint.com");
         input.setLayoutParams(lp);
         alertDialog.setView(input);
 
@@ -81,10 +86,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void onClickEmail(Context context, String email) {
         String downloadLink = GenerateBranchUrl(context, email);
-        String body = "Recommend the app.\n\nPlease click the line to download\n" + downloadLink;
+        String body = "Recommend the app.\n\nPlease click the link to download/install\n" + downloadLink;
 
         String uriText = "mailto:" + email +
-                "?subject=" + Uri.encode("Share with you") +
+                "?subject=" + Uri.encode("Recommend test app") +
                 "&body=" + Uri.encode(body);
 
         Uri uri = Uri.parse(uriText);
