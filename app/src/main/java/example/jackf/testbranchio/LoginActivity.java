@@ -103,6 +103,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         DUMMY_CREDENTIALS.add("zap@invisibi.com.tw:12345");
         DUMMY_CREDENTIALS.add("foo@example.com:hello");
+        DUMMY_CREDENTIALS.add("jack@:*");
         addCurrAccount();
     }
 
@@ -395,7 +396,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             String errorMsg = null;
             try {
                 // Simulate network access.
-                Thread.sleep(2000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 errorMsg = getString(R.string.error_incorrect_password);
                 return errorMsg;
