@@ -9,6 +9,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -71,7 +73,8 @@ public class MainActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         String email = input.getText().toString();
-                        onClickEmail(MainActivity.this, email);
+//                        onClickEmail(MainActivity.this, email);
+                        startMailClient(MainActivity.this, email);
                     }
                 });
 
@@ -98,6 +101,34 @@ public class MainActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setData(uri);
         context.startActivity(intent);
+    }
+
+    private void startMailClient(Context context, String email) {
+        //String downloadLink = GenerateBranchUrl(context, email);
+        //String body = "Recommend the test app\n\nPlease click the link to download/install\n" + downloadLink;
+        String body = "John,\n\nit's nice to meet you.\nHere's my Zappoint card for you.\nhttp://www.zappoint.com\n\nJack";
+
+        // Try to open e-mail client with Html.
+        // But it only works on Gmail
+        // http://stackoverflow.com/questions/11447445/android-how-to-send-html-email-and-force-android-to-send-it-through-g-mail-not?rq=1
+//        StringBuilder htmBuilder = new StringBuilder();
+//        htmBuilder.append("<p><b>Nice to meet you<b><p>");
+//        htmBuilder.append("<img src=\"http://files.parsetfss.com/88643df2-0c5d-4c03-a2d1-17143a6bf20e/tfss-14adac46-f042-487e-ab0f-422a2ea8d013-pic\"/>");
+//        htmBuilder.append("<small><p>More content</p></small>");
+//        Spanned body = Html.fromHtml(htmBuilder.toString());
+
+
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO,
+                Uri.fromParts("mailto", email, null));
+        emailIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Follow-up from Jack");
+        emailIntent.putExtra(Intent.EXTRA_TEXT, body);
+
+        Uri imageUri = Uri.parse("file://" + "/sdcard/Pictures/hi_msg.jpg");
+        emailIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+        //shareIntent.setType("image/jpeg");
+
+        context.startActivity(emailIntent);
     }
 
     private String GenerateBranchUrl(Context context, String email) {
